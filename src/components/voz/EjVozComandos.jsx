@@ -1,62 +1,77 @@
-import React, { useState } from 'react'
+import Grid from "@mui/material/Grid2";
+import {useState} from "react";
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
+import {useNavigate} from "react-router-dom";
 
-const VozOrdenes = () => {
+const ComandosVoz = () => {
+    const [colorCircle, setColorCircle] = useState(['#A59D84', '#A59D84', '#A59D84'])
 
-  const [message, setMessage] = useState('')
-  const commands = [
-    {
-      command: 'Me gustaría pedir *',
-      callback: (food) => setMessage(`Tu pedido es de: ${food}`)
-    },
-    {
-      command: 'El tiempo está :condition hoy',
-      callback: (condition) => setMessage(`Hoy el tiempo está ${condition}`)
-    },
-    {
-      command: 'Mis deportes favoritos son * y *',
-      callback: (sport1, sport2) => setMessage(`#1: ${sport1}, #2: ${sport2}`)
-    },
-    {
-      command: 'Pásame la sal (por favor)',
-      callback: () => setMessage('Aquí tienes')
-    },
-    {
-      command: ['Hola', 'Holitas'],
-      callback: ({ command }) => setMessage(`Hola. Dijiste: "${command}"`),
-      matchInterim: true
-    },
-    {
-      command: 'Beijing',
-      callback: (command, spokenPhrase, similarityRatio) => setMessage(`${command} and ${spokenPhrase} are ${similarityRatio * 100}% similar`),
-      // If the spokenPhrase is "Benji", the message would be "Beijing and Benji are 40% similar"
-      isFuzzyMatch: true,
-      fuzzyMatchingThreshold: 0.2
-    },
-    {
-      command: 'borrar',
-      callback: ({ resetTranscript }) => resetTranscript()
+    const [showGif, setShowGif] = useState(false)
+    const [showGif2, setShowGif2] = useState(false)
+    const [showGif3, setShowGif3] = useState(false)
+    const [showGifTodos, setShowGifTodos] = useState(false)
+
+    const navigate = useNavigate();
+
+    const commands = [
+        {
+            command: 'Encender luces.',
+            callback: () => {
+                setColorCircle(['#FCC737', '#FCC737', '#FCC737']);
+            }
+        },
+        {
+            command: 'Encender luz derecha.',
+            callback: () => {setColorCircle(['#A59D84', '#A59D84', '#FCC737']);
+            }
+        },
+        {
+            command: 'Encender luz izquierda.',
+            callback: () => {setColorCircle(['#FCC737', '#A59D84','#A59D84']);
+
+            }
+        },
+        {
+            command: 'Encender luz centro.',
+            callback: () => {setColorCircle(['#A59D84', '#FCC737', '#A59D84']);
+            }
+        },
+        {
+            command: 'Apagar luces.',
+            callback: () => {setColorCircle(['#A59D84', '#A59D84', '#A59D84']);
+            }
+        }
+    ]
+
+    const { transcript, browserSupportsSpeechRecognition } = useSpeechRecognition({ commands })
+    console.log(transcript)
+    if (!browserSupportsSpeechRecognition) {
+        return null
     }
-  ]
 
-  const { transcript, browserSupportsSpeechRecognition } = useSpeechRecognition({ commands })
-  console.log(transcript)
-  if (!browserSupportsSpeechRecognition) {
-    return null
-  }
+    const Circle = (props) => ({
+        width: "100px",
+        height: "100px",
+        borderRadius: "50%",
+        backgroundColor: props.color,
+    });
 
-   
-  
-  console.log(message)
-  return (
-    <div>
-      <button onClick={SpeechRecognition.startListening}>Start</button>
-      <button onClick={SpeechRecognition.stopListening}>Stop</button>
-      <p>{transcript}</p>
-      <p>{message}</p>
-      
-     
-    </div>
-  )
+        return(
+            <>
+                <Grid container spacing={58} sx={{ width: '100%' }}  justifyContent="center">
+                    {colorCircle.map((color, index) => (
+                        <Grid item xs={6} sm={4} md={3} lg={2} key={index}>
+                        <div key={index} style={Circle({ color })}></div>
+                        </Grid>
+                    ))}
+                </Grid>
+
+                <Grid container spacing={1} justifyContent="center" sx={{ marginTop: 2, width: '100%' }}>
+                    <button onClick={SpeechRecognition.startListening}>Start</button>
+                    <button onClick={SpeechRecognition.stopListening}>Stop</button>
+                </Grid>
+            </>
+        )
 }
-export default VozOrdenes
+
+export default ComandosVoz
