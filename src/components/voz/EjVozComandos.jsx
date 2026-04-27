@@ -1,77 +1,66 @@
 import Grid from "@mui/material/Grid2";
-import {useState} from "react";
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
-import {useNavigate} from "react-router-dom";
+import { useState, useMemo } from "react";
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 const ComandosVoz = () => {
-    const [colorCircle, setColorCircle] = useState(['#A59D84', '#A59D84', '#A59D84'])
+    const [colorCircle, setColorCircle] = useState(['#A59D84', '#A59D84', '#A59D84']);
 
-    const [showGif, setShowGif] = useState(false)
-    const [showGif2, setShowGif2] = useState(false)
-    const [showGif3, setShowGif3] = useState(false)
-    const [showGifTodos, setShowGifTodos] = useState(false)
-
-    const navigate = useNavigate();
-
-    const commands = [
+    const commands = useMemo(() => [
         {
-            command: 'Encender luces.',
-            callback: () => {
-                setColorCircle(['#FCC737', '#FCC737', '#FCC737']);
-            }
+            command: 'encender luces',   
+            callback: () => setColorCircle(['#FCC737', '#FCC737', '#FCC737']),
         },
         {
-            command: 'Encender luz derecha.',
-            callback: () => {setColorCircle(['#A59D84', '#A59D84', '#FCC737']);
-            }
+            command: 'encender luz derecha',
+            callback: () => setColorCircle(['#A59D84', '#A59D84', '#FCC737']),
         },
         {
-            command: 'Encender luz izquierda.',
-            callback: () => {setColorCircle(['#FCC737', '#A59D84','#A59D84']);
-
-            }
+            command: 'encender luz izquierda',
+            callback: () => setColorCircle(['#FCC737', '#A59D84', '#A59D84']),
         },
         {
-            command: 'Encender luz centro.',
-            callback: () => {setColorCircle(['#A59D84', '#FCC737', '#A59D84']);
-            }
+            command: 'encender luz centro',
+            callback: () => setColorCircle(['#A59D84', '#FCC737', '#A59D84']),
         },
         {
-            command: 'Apagar luces.',
-            callback: () => {setColorCircle(['#A59D84', '#A59D84', '#A59D84']);
-            }
-        }
-    ]
+            command: 'apagar luces',
+            callback: () => setColorCircle(['#A59D84', '#A59D84', '#A59D84']),
+        },
+    ], []);
 
-    const { transcript, browserSupportsSpeechRecognition } = useSpeechRecognition({ commands })
-    console.log(transcript)
-    if (!browserSupportsSpeechRecognition) {
-        return null
-    }
+    const { transcript,resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition({ commands });
 
-    const Circle = (props) => ({
+    if (!browserSupportsSpeechRecognition) return null;
+
+    const circleStyle = (color) => ({
         width: "100px",
         height: "100px",
         borderRadius: "50%",
-        backgroundColor: props.color,
+        backgroundColor: color,
     });
 
-        return(
-            <>
-                <Grid container spacing={58} sx={{ width: '100%' }}  justifyContent="center">
-                    {colorCircle.map((color, index) => (
-                        <Grid item xs={6} sm={4} md={3} lg={2} key={index}>
-                        <div key={index} style={Circle({ color })}></div>
-                        </Grid>
-                    ))}
-                </Grid>
+    return (
+        <>
+            <Grid container spacing={58} sx={{ width: '100%' }} justifyContent="center">
+                {colorCircle.map((color, index) => (
+                    <Grid item xs={6} sm={4} md={3} lg={2} key={index}>
+                        <div style={circleStyle(color)}></div>
+                    </Grid>
+                ))}
+            </Grid>
 
-                <Grid container spacing={1} justifyContent="center" sx={{ marginTop: 2, width: '100%' }}>
-                    <button onClick={SpeechRecognition.startListening}>Start</button>
-                    <button onClick={SpeechRecognition.stopListening}>Stop</button>
-                </Grid>
-            </>
-        )
-}
+            <p>Transcripción: {transcript}</p> 
 
-export default ComandosVoz
+            <Grid container spacing={1} justifyContent="center" sx={{ marginTop: 2, width: '100%' }}>
+                <button onClick={() => SpeechRecognition.startListening({ language: 'es-ES', continuous: true })}>
+                    Start
+                </button>
+                <button onClick={SpeechRecognition.stopListening}>Stop</button>
+                <button onClick={resetTranscript}>Limpiar</button>
+
+            </Grid>
+        </>
+    );
+};
+
+export default ComandosVoz;

@@ -20,8 +20,9 @@ function EjVoz(){
       return (
         <div>
           <p>Microphone: {listening ? 'on' : 'off'}</p>
-          <button onClick={SpeechRecognition.startListening}>Start</button>
-          {/*Si queremos que se escuche continuamente:
+          <button onClick={() => SpeechRecognition.startListening({ language: 'es-ES' })}>
+             Start
+          </button>          {/*Si queremos que se escuche continuamente:
           <button onClick={() => SpeechRecognition.startListening({continuous: true})}>Start</button>*/}
           <button onClick={SpeechRecognition.stopListening}>Stop</button>
           <button onClick={resetTranscript}>Reset</button>
